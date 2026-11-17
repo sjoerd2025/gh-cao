@@ -47,6 +47,45 @@ operations instead request explicit targets without inventory selection.
 [From Outcome to Execution](operation-patterns.md) derives the structure from
 the desired outcome, target scope, and execution requirements.
 
+## System Architecture Topology
+
+The end-to-end component topology and execution data flow across Central Agentic Ops:
+
+```mermaid
+flowchart LR
+  accTitle: Central Agentic Ops System Architecture
+  accDescr: End-to-end component topology showing Campaign Catalog, Control Repository, Policy Resolver, Campaign Orchestrator, One-Target Worker, Target Repository, Dashboard Server, and PostgreSQL Database.
+  catalog["Campaign Catalog<br/><i>campaigns and workflows</i>"]
+  control_repo["Control Repository<br/><i>cao.json & credentials</i>"]
+  policy_resolver["Policy Resolver<br/><i>admit & narrow</i>"]
+  orchestrator["Campaign Orchestrator<br/><i>dispatch orchestration</i>"]
+  worker["One-Target Worker<br/><i>bounded safe execution</i>"]
+  target_repo["Target Repository<br/><i>authorized live output</i>"]
+  dashboard_server["Dashboard Server<br/><i>Go loopback HTTP</i>"]
+  postgres_db[("PostgreSQL Database<br/><i>canonical & operational</i>")]
+
+  catalog -->|installs reviewed release| control_repo
+  control_repo -->|supplies policy & credentials| policy_resolver
+  policy_resolver -->|admits & narrows| orchestrator
+  orchestrator -->|bounded dispatch| worker
+  worker -->|authorized live output| target_repo
+  dashboard_server -->|reads & writes state| postgres_db
+```
+
+### Component Roles and Boundaries
+
+| Component | Responsibility | Boundary & Authority |
+| --- | --- | --- |
+| **Campaign Catalog** | Versioned repository holding campaign sources, manifests (`aw.yml`), and releases. | Supplies packages to install; holds no execution credentials or target access. |
+| **Control Repository** | Host repository managing `.github/workflows/cao.json` policy and Actions secrets. | Sole persistent rollout policy authority; dispatches orchestrators and workers. |
+| **Policy Resolver** | Bounded policy evaluation kernel that admits targets and narrows permissions. | Resolves ceilings without discovering extra repositories or mutating policy. |
+| **Campaign Orchestrator** | Dispatches work for admitted targets according to resolved policy and mode. | Bounded inventory selection; does not mutate targets directly. |
+| **One-Target Worker** | Executes agentic tasks against exactly one assigned target repository. | Operates with declared safe outputs; cannot widen scope or dispatch work. |
+| **Target Repository** | Repository receiving declared safe outputs (PRs, issues, or review artifacts). | Owns target code protections; its files cannot grant control-plane authority. |
+| **Dashboard Server** | Go server hosting the web UI, OAuth authentication, and query API. | Bounded loopback or hosted service executing queries against PostgreSQL. |
+| **PostgreSQL Database** | Persistent relational storage for canonical and operational state. | Rebuildable projection storing activity shards, run counts, and budgets. |
+
+
 ### Repository roles and records
 
 | Role | Owns | Does not grant |

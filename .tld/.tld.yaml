@@ -1,0 +1,12 @@
+project_name: gh-cao
+exclude:
+    - .git/
+    - vendor/
+    - node_modules/
+    - '**/*_test.go'
+    - '**/*.pb.go'
+repositories:
+    gh-cao:
+        url: https://github.com/sjoerd2025/gh-cao.git
+        config:
+            mode: upsert

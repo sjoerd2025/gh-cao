@@ -1,0 +1,63 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Mertcikla/tld/refs/heads/main/schemas/connectors.schema.json
+- view: dashboard-site-packages-source-map-compat
+  source: index-cjs
+  target: source-map-compat-package-json
+  direction: backward
+  style: bezier
+  source_handle: right
+  target_handle: left
+  tags:
+    - dependency
+  id: 2XKYmKqL
+- view: packages-astro-no-cache
+  source: astro-no-cache-index-js
+  target: astro-no-cache-package-json
+  direction: backward
+  style: bezier
+  source_handle: right
+  target_handle: left
+  tags:
+    - dependency
+  id: AP4kYQRg
+- view: root
+  source: catalog
+  target: control-repo
+  label: installs reviewed release
+  direction: forward
+  style: bezier
+  id: lW4EgQen
+- view: root
+  source: control-repo
+  target: policy-resolver
+  label: supplies policy & credentials
+  direction: forward
+  style: bezier
+  id: 02QrWKVd
+- view: root
+  source: dashboard-server
+  target: postgres-db
+  label: reads & writes state
+  direction: forward
+  style: bezier
+  id: xjQngK1r
+- view: root
+  source: orchestrator
+  target: worker
+  label: bounded dispatch
+  direction: forward
+  style: bezier
+  id: EmyWqKAX
+- view: root
+  source: policy-resolver
+  target: orchestrator
+  label: admits & narrows
+  direction: forward
+  style: bezier
+  id: ER4oW4Mx
+- view: root
+  source: worker
+  target: target-repo
+  label: authorized live output
+  direction: forward
+  style: bezier
+  id: GWyNlKqn
